@@ -24,7 +24,7 @@ La différence avec un rôle de développeur « à la spec » tient en une quest
 | | Développeur « à la spec » | Product Engineer |
 |---|---|---|
 | **Point de départ** | Un ticket rédigé par quelqu'un d'autre | Un problème utilisateur ou métier |
-| **Question clé** | *Comment* le coder ? | *Pourquoi* le faire, et quelle est la plus petite version utile ? |
+| **Question clé** | *Comment* le coder ? | *Pourquoi* le faire, et quelle est la plus petite unité qui valide l'hypothèse ? |
 | **Périmètre** | Sa brique (back, front…) | De bout en bout : API, front, données, déploiement |
 | **« Terminé » veut dire** | Mergé | En production, utilisé, mesuré |
 | **Face au métier** | Exécute | Challenge, propose, arbitre la valeur contre le coût |
@@ -33,7 +33,7 @@ Pour tenir ce rôle sans s'épuiser, il faut un code qui accepte le changement :
 
 ```mermaid
 flowchart LR
-    A["Comprendre<br/>le besoin"] --> B["Cadrer<br/>& découper"]
+    A["Comprendre<br/>le besoin"] --> B["Découper en la plus petite<br/>unité qui valide l'hypothèse"]
     B --> C["Construire<br/>en TDD"]
     C --> D["Livrer en<br/>production"]
     D --> E["Observer<br/>& écouter"]
@@ -45,7 +45,7 @@ flowchart LR
 ## Ma façon de travailler
 
 **01 · Challenger le besoin**
-Cadrer avec le métier, questionner la valeur, découper en incréments livrables. Chez IAD, j'ai identifié que des règles d'éligibilité appartenaient à l'équipe Mandats et je les ai redirigées vers elle, plutôt que de laisser fuir du contexte métier dans notre code.
+Cadrer avec le métier, questionner la valeur, puis **découper** : on cherche la plus petite unité livrable avec laquelle on est capable de valider l'hypothèse du besoin. On livre, on observe, et seulement ensuite on décide d'aller plus loin. Chez IAD, j'ai identifié que des règles d'éligibilité appartenaient à l'équipe Mandats et je les ai redirigées vers elle, plutôt que de laisser fuir du contexte métier dans notre code.
 
 **02 · Livrer sans dette**
 Architecture hexagonale + TDD, assisté par l'IA (Claude Code) : le domaine reste pur, les détails techniques sont des adapters, et un pivot produit ne casse pas tout.
