@@ -44,14 +44,14 @@ flowchart LR
 
 ## Ma façon de travailler
 
-**01 · Challenger le besoin**
-Cadrer avec le métier, questionner la valeur, puis **découper** : on cherche la plus petite unité livrable avec laquelle on est capable de valider l'hypothèse du besoin. On livre, on observe, et seulement ensuite on décide d'aller plus loin. Chez IAD, j'ai identifié que des règles d'éligibilité appartenaient à l'équipe Mandats et je les ai redirigées vers elle, plutôt que de laisser fuir du contexte métier dans notre code.
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="assets/pillars-dark.svg">
+  <img alt="01 Challenger le besoin : découper en la plus petite unité qui valide l'hypothèse du besoin. 02 Livrer sans dette : architecture hexagonale + TDD, assistée par l'IA (Claude Code). 03 Itérer : chaque retour utilisateur devient une évolution, vite et en confiance grâce aux tests." src="assets/pillars-light.svg" width="100%">
+</picture>
 
-**02 · Livrer sans dette**
-Architecture hexagonale + TDD, assisté par l'IA (Claude Code) : le domaine reste pur, les détails techniques sont des adapters, et un pivot produit ne casse pas tout.
-
-**03 · Itérer**
-Transformer chaque retour utilisateur en évolution, vite et en confiance — les tests sont le filet qui rend la vitesse possible.
+- **Découper**, c'est chercher la plus petite unité livrable avec laquelle on est capable de valider l'hypothèse du besoin. On livre, on observe, et seulement ensuite on décide d'aller plus loin.
+- **Challenger**, c'est aussi savoir dire « pas chez nous » : chez IAD, j'ai identifié que des règles d'éligibilité appartenaient à l'équipe Mandats et je les lui ai redirigées, plutôt que de laisser fuir du contexte métier dans notre code.
+- **Sans dette**, parce que le domaine reste pur et que les détails techniques sont des adapters : un pivot produit ne casse pas tout.
 
 ---
 
