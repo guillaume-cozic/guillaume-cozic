@@ -6,6 +6,12 @@ import QaRunnerAnimation from '../components/animations/QaRunnerAnimation.astro'
 import AttelyaAnimation from '../components/animations/AttelyaAnimation.astro';
 import ButterflyAnimation from '../components/animations/ButterflyAnimation.astro';
 
+const softSkills = [
+  { title: 'Pédagogie', text: 'Expliquer simplement des choix techniques à des non-techniciens.' },
+  { title: 'Écoute', text: 'Faire expliciter les besoins métier et les challenger de manière constructive.' },
+  { title: 'Focus', text: "Aider l'équipe à prioriser l'essentiel." },
+];
+
 const method = [
   {
     step: 'Des tests unitaires solides',
@@ -226,6 +232,22 @@ const method = [
               <h3>{m.step}</h3>
               <p>{m.text}</p>
               <ul class="tools">{m.tools.map((t) => <li>{t}</li>)}</ul>
+            </li>
+          ))}
+        </ol>
+      </div>
+    </section>
+
+    <section id="savoir-etre" class="method soft">
+      <div class="container">
+        <p class="eyebrow reveal">Savoir-être</p>
+        <h2 class="reveal">Comment je travaille avec l'équipe</h2>
+        <ol class="steps">
+          {softSkills.map((s, i) => (
+            <li class="reveal" style={`transition-delay: ${i * 90}ms`}>
+              <span class="mono">0{i + 1}</span>
+              <h3>{s.title}</h3>
+              <p>{s.text}</p>
             </li>
           ))}
         </ol>
@@ -495,6 +517,7 @@ const method = [
     background: var(--bg-2);
     position: relative;
   }
+  .soft .steps { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .steps .mono { color: var(--ink-3); font-size: 0.8rem; }
   .steps h3 { font-size: 1.3rem; margin: 8px 0 10px; }
   .steps p { margin: 0; color: var(--ink-2); font-size: 0.93rem; }
