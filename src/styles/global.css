@@ -1,0 +1,85 @@
+:root {
+  --bg: #0b0d12;
+  --bg-2: #11141b;
+  --panel: #151922;
+  --line: #262b37;
+  --ink: #ece9e2;
+  --ink-2: #a9adb8;
+  --ink-3: #6f7482;
+
+  --zb: #3b82f6;
+  --zb-2: #f2675a;
+  --qa: #3ddc84;
+  --qa-ko: #ff5d5d;
+  --at: #c49bff;
+  --at-2: #f6b97a;
+  --bf: #f5a524;
+  --cv-orange: #e0703a;
+  --cv-blue: #6f9be0;
+
+  --font-display: 'Space Grotesk', system-ui, sans-serif;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 17px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: inherit; }
+
+h1, h2, h3 { font-family: var(--font-display); line-height: 1.1; margin: 0; }
+
+.container {
+  width: min(1180px, 100% - 32px);
+  margin-inline: auto;
+}
+
+.mono { font-family: var(--font-mono); }
+
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+/* Apparition au défilement */
+.reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.8s ease, transform 0.8s cubic-bezier(.2,.7,.2,1);
+}
+.reveal.is-visible { opacity: 1; transform: none; }
+
+/* Animations SVG : rien ne bouge tant que la scène n'est pas jouée */
+.scene * { animation-play-state: paused; }
+.scene.play * { animation-play-state: running; }
+.scene svg { display: block; width: 100%; height: auto; }
+.scene text { font-family: var(--font-body); }
+.scene .m { font-family: var(--font-mono); }
+.scene .fb { transform-box: fill-box; transform-origin: center; }
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .reveal { opacity: 1; transform: none; transition: none; }
+  .scene *, .scene.play * {
+    animation-duration: 0.001s !important;
+    animation-delay: 0s !important;
+    animation-iteration-count: 1 !important;
+    animation-play-state: running !important;
+  }
+}

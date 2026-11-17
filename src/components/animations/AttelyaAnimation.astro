@@ -1,0 +1,416 @@
+---
+// Attelya : reproduction de l'atelier réel (apps/web) : barre du haut, conversation avec
+// l'assistant, aperçu flouté pendant que l'agent travaille (feature 006) avec la carte
+// « L'agent travaille sur », propositions de couleurs, puis publication de la version 1.
+
+const win = (a: number, b: number) => ({ class: 'win', style: `--a:${a}s; --b:${b}s` });
+const from = (a: number) => ({ class: 'from', style: `--a:${a}s` });
+const until = (b: number) => ({ class: 'until', style: `--b:${b}s` });
+
+// Tour 1 de l'agent : trois étapes
+const steps = [
+  { label: 'Choisir une direction artistique', title: 'Tout le site', a: 1.7, b: 2.7, band: 'all' },
+  { label: "Composer la page d'accueil", title: "La page d'accueil", a: 2.7, b: 3.7, band: 'top' },
+  { label: 'Placer vos photos de scène', title: 'Vos photos et vos vidéos', a: 3.7, b: 4.7, band: 'mid' },
+];
+const STEP2 = { label: 'Appliquer les couleurs Couchant', a: 7.3, b: 8.3 };
+
+const dates = [
+  { d: '14 mars', c: 'Brest · Théâtre du Port' },
+  { d: '2 avril', c: 'Nantes · La Fabrique' },
+  { d: '18 mai', c: 'Lorient · Scène des Marées' },
+];
+const particles = Array.from({ length: 14 }, (_, i) => {
+  const angle = (i / 14) * Math.PI * 2;
+  const r = 150 + (i % 3) * 30;
+  return { x: Math.round(Math.cos(angle) * r), y: Math.round(Math.sin(angle) * r * 0.75), d: (i % 7) * 0.25 };
+});
+const sparks = Array.from({ length: 10 }, (_, i) => {
+  const angle = (i / 10) * Math.PI * 2;
+  return { x: Math.round(Math.cos(angle) * 46), y: Math.round(Math.sin(angle) * 34), c: i % 2 ? '#4b32c3' : '#f6b97a' };
+});
+const pubSteps = [
+  { label: 'Préparation de la version 1', a: 10.2, b: 10.6 },
+  { label: 'Vérification des pages', a: 10.6, b: 11.0 },
+  { label: 'Mise en ligne', a: 11.0, b: 11.4 },
+];
+---
+
+<div class="scene at" id="scene-attelya" data-loop="13500" role="img"
+  aria-label="Animation de l'atelier Attelya : une comédienne écrit à l'assistant, l'aperçu se floute pendant que l'agent travaille étape par étape, le site apparaît, elle choisit la palette Couchant parmi les propositions, puis publie la version 1.">
+  <svg viewBox="0 0 600 400" aria-hidden="true">
+    <defs>
+      <clipPath id="at-frame"><rect width="600" height="400" rx="18" /></clipPath>
+      <clipPath id="at-site"><rect x="232" y="66" width="356" height="326" rx="8" /></clipPath>
+      <clipPath id="at-photo"><rect x="470" y="96" width="106" height="122" rx="8" /></clipPath>
+      <clipPath id="at-typed"><rect class="typed" x="18" y="362" width="160" height="14" /></clipPath>
+      <clipPath id="at-shimmer"><rect x="299" y="212" width="222" height="3" rx="1.5" /></clipPath>
+      <filter id="at-blur" x="-5%" y="-5%" width="110%" height="110%"><feGaussianBlur stdDeviation="5" /></filter>
+      <linearGradient id="at-cold" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#14305c" /><stop offset="1" stop-color="#3a7bbf" />
+      </linearGradient>
+      <linearGradient id="at-warm" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#6b2340" /><stop offset="1" stop-color="#e58a56" />
+      </linearGradient>
+      <linearGradient id="at-spot" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#fff6d8" stop-opacity=".9" /><stop offset="1" stop-color="#fff6d8" stop-opacity="0" />
+      </linearGradient>
+    </defs>
+
+    <g clip-path="url(#at-frame)">
+      <rect width="600" height="400" fill="#f4f4f6" />
+
+      <!-- barre du haut -->
+      <rect width="600" height="34" fill="#fff" />
+      <line x1="0" x2="600" y1="34" y2="34" stroke="#e3e3e8" />
+      <rect x="12" y="7" width="20" height="20" rx="6" fill="#4b32c3" />
+      <path d="M17.5,22 L22,12 L26.5,22 M19.3,18.4 H24.7" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+      <text x="38" y="22" font-size="12" font-weight="700" fill="#17171c" style="font-family: var(--font-display)">Attelya</text>
+      <g font-size="8.5" font-weight="500">
+        <rect x="90" y="9" width="42" height="16" rx="5" fill="#eeebfb" />
+        <text x="111" y="20" text-anchor="middle" fill="#36239a" font-weight="600">Atelier</text>
+        <text x="142" y="20" fill="#4a4a55">Contenus</text>
+        <text x="186" y="20" fill="#4a4a55">Médiathèque</text>
+        <text x="245" y="20" fill="#4a4a55">Adresse</text>
+      </g>
+      <rect x="352" y="8" width="72" height="18" rx="6" fill="#fff" stroke="#e3e3e8" />
+      <text x="360" y="20" font-size="8" font-weight="500" fill="#17171c">Site principal</text>
+      <path d="M413,15 L416,18 L419,15" fill="none" stroke="#4a4a55" stroke-width="1.2" stroke-linecap="round" />
+      <text class="until" style="--b:11.4s" x="430" y="20" font-size="7.5" fill="#5f5f6b">Pas encore en ligne</text>
+      <g class="from" style="--a:11.45s">
+        <circle cx="434" cy="17" r="3" fill="#1d6b3a" />
+        <text x="440" y="20" font-size="7.5" font-weight="600" fill="#1d6b3a">En ligne : v1</text>
+      </g>
+      <g transform="translate(531 17)">
+        <g class="press" style="--a:10s">
+          <rect x="-24" y="-9" width="48" height="18" rx="6" fill="#4b32c3" />
+          <text y="3" text-anchor="middle" font-size="8.5" font-weight="600" fill="#fff">Publier</text>
+        </g>
+      </g>
+      <circle cx="576" cy="17" r="10" fill="#17171c" />
+      <circle cx="576" cy="14.5" r="3" fill="none" stroke="#fff" stroke-width="1.2" />
+      <path d="M570.5,23 a5.5,5.5 0 0 1 11,0" fill="none" stroke="#fff" stroke-width="1.2" />
+
+      <!-- conversation -->
+      <rect x="0" y="34" width="220" height="366" fill="#fff" />
+      <line x1="220" x2="220" y1="34" y2="400" stroke="#e3e3e8" />
+
+      <text x="12" y="54" font-size="8.5" fill="#17171c"><tspan>Bonjour ! Parlez-moi de votre travail :</tspan><tspan x="12" dy="12">que créez-vous ?</tspan></text>
+
+      <g class="from" style="--a:0.9s">
+        <path d="M74,76 H200 a8,8 0 0 1 8,8 V102 a2,2 0 0 1 -2,2 H74 a8,8 0 0 1 -8,-8 V84 a8,8 0 0 1 8,-8 Z" fill="#17171c" />
+        <text x="76" y="88" font-size="8.5" fill="#fff"><tspan>Je suis comédienne, mes</tspan><tspan x="76" dy="11">spectacles parlent de la mer.</tspan></text>
+      </g>
+
+      <g class="win" style="--a:1.3s; --b:1.9s">
+        <circle class="dot" cx="16" cy="122" r="2" fill="#4b32c3" />
+        <circle class="dot d2" cx="23" cy="122" r="2" fill="#4b32c3" />
+        <circle class="dot d3" cx="30" cy="122" r="2" fill="#4b32c3" />
+        <text x="38" y="125" font-size="8" font-weight="500" fill="#36239a">L'assistant écrit…</text>
+      </g>
+      <text class="from" style="--a:1.9s" x="12" y="125" font-size="8.5" fill="#17171c"><tspan>Je pars sur un univers marin, avec vos</tspan><tspan x="12" dy="12">photos de scène.</tspan></text>
+
+      {[...steps, { ...STEP2 }].map((s, i) => {
+        const y = i < 3 ? 156 + i * 13 : 297;
+        return (
+          <g class="from" style={`--a:${s.a}s`}>
+            <g {...until(s.b)}>
+              <circle cx="17" cy={y - 3} r="4" fill="none" stroke="#cfc7f5" stroke-width="1.5" />
+              <circle cx="17" cy={y - 3} r="2" fill="#4b32c3" />
+            </g>
+            <g {...from(s.b)}>
+              <circle cx="17" cy={y - 3} r="4.5" fill="#e7f5ec" />
+              <path d={`M14.8,${y - 3} L16.4,${y - 1.4} L19.4,${y - 4.6}`} fill="none" stroke="#1d6b3a" stroke-width="1.2" stroke-linecap="round" />
+            </g>
+            <text x="26" y={y} font-size="8" fill="#5f5f6b">{s.label}</text>
+          </g>
+        );
+      })}
+
+      <g class="from" style="--a:6s">
+        <text x="12" y="208" font-size="8" fill="#5f5f6b">Couleurs proposées</text>
+        <rect x="12" y="214" width="94" height="40" rx="8" fill="#fff" stroke="#e3e3e8" />
+        <rect x="13" y="215" width="31" height="22" fill="#14305c" />
+        <rect x="44" y="215" width="31" height="22" fill="#3a7bbf" />
+        <rect x="75" y="215" width="30" height="22" fill="#9fd3e6" />
+        <text x="19" y="248" font-size="8" font-weight="600" fill="#17171c">Marée</text>
+        <rect x="114" y="214" width="94" height="40" rx="8" fill="#fff" stroke="#e3e3e8" />
+        <rect x="115" y="215" width="31" height="22" fill="#6b2340" />
+        <rect x="146" y="215" width="31" height="22" fill="#e58a56" />
+        <rect x="177" y="215" width="30" height="22" fill="#ffd29a" />
+        <text x="121" y="248" font-size="8" font-weight="600" fill="#17171c">Couchant</text>
+        <rect class="from" style="--a:6.9s" x="114" y="214" width="94" height="40" rx="8" fill="none" stroke="#4b32c3" stroke-width="1.6" />
+      </g>
+
+      <g class="from" style="--a:7.1s">
+        <path d="M110,262 H200 a8,8 0 0 1 8,8 V282 a2,2 0 0 1 -2,2 H110 a8,8 0 0 1 -8,-8 V270 a8,8 0 0 1 8,-8 Z" fill="#17171c" />
+        <text x="112" y="276" font-size="8.5" fill="#fff">Je choisis « Couchant »</text>
+      </g>
+      <text class="from" style="--a:9.1s" x="12" y="318" font-size="8.5" fill="#17171c">C'est fait : votre site est prêt à publier.</text>
+
+      <!-- zone de saisie -->
+      <line x1="0" x2="220" y1="340" y2="340" stroke="#e3e3e8" />
+      <rect x="12" y="352" width="196" height="36" rx="10" fill="#fff" stroke="#e3e3e8" />
+      <text class="ph" x="18" y="373" font-size="8" fill="#5f5f6b">Par exemple : je suis danseuse, et je…</text>
+      <text class="win" style="--a:0.15s; --b:0.9s" clip-path="url(#at-typed)" x="18" y="373" font-size="8" fill="#17171c">Je suis comédienne, mes spectacles…</text>
+      <g transform="translate(193 370)">
+        <g class="press" style="--a:0.8s">
+          <rect x="-11" y="-11" width="22" height="22" rx="7" fill="#4b32c3" />
+          <path d="M-4,0 H4 M0,-4 L4,0 L0,4" fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        </g>
+      </g>
+
+      <!-- aperçu -->
+      <rect x="440" y="42" width="148" height="18" rx="6" fill="#f0f0f3" />
+      <rect x="442" y="44" width="70" height="14" rx="5" fill="#fff" />
+      <text x="477" y="54" text-anchor="middle" font-size="7.5" font-weight="600" fill="#17171c">Ordinateur</text>
+      <text x="550" y="54" text-anchor="middle" font-size="7.5" font-weight="500" fill="#4a4a55">Mobile</text>
+
+      <g clip-path="url(#at-site)">
+        {[false, true].map((blurred) => (
+          <g class={blurred ? 'veil' : undefined}>
+            <g filter={blurred ? 'url(#at-blur)' : undefined}>
+              <rect x="232" y="66" width="356" height="326" fill="#faf7f2" />
+              <g class="until" style="--b:2.5s">
+                <rect x="232" y="86" width="356" height="146" fill="#e9e6e0" />
+                <rect x="246" y="150" width="150" height="16" rx="4" fill="#dad5cc" />
+                <rect x="246" y="174" width="110" height="8" rx="4" fill="#dad5cc" />
+                <rect x="470" y="96" width="106" height="122" rx="8" fill="#dad5cc" />
+                <rect x="246" y="246" width="110" height="10" rx="4" fill="#e9e6e0" />
+                {dates.map((_, i) => <rect x="246" y={264 + i * 40} width="328" height="32" rx="6" fill="#efebe4" />)}
+              </g>
+              <g class="from" style="--a:2.5s">
+                <rect x="232" y="86" width="356" height="146" fill="url(#at-cold)" />
+                <g class="from" style="--a:7.8s">
+                  <rect x="232" y="86" width="356" height="146" fill="url(#at-warm)" />
+                  <circle cx="420" cy="232" r="40" fill="#ffd29a" opacity=".45" />
+                </g>
+                <path d="M232,214 q22,-10 44,0 t44,0 t44,0 t44,0 t44,0 t44,0 t44,0 t44,0" fill="none" stroke="#fff" stroke-opacity=".3" stroke-width="1.5" />
+                <text x="246" y="80" font-size="9.5" font-family="Fraunces, serif" fill="#2b2620">Loraine Marin</text>
+                <text x="576" y="79" text-anchor="end" font-size="7.5" fill="#6d6458" word-spacing="5">Créations Agenda Présentation</text>
+              </g>
+              <g class="from" style="--a:2.9s">
+                <text x="246" y="170" font-size="25" font-family="Fraunces, serif" font-weight="500" fill="#fff">Loraine Marin</text>
+                <text x="247" y="188" font-size="8.5" fill="#fff" fill-opacity=".85">Comédienne · théâtre d'objets</text>
+                <rect x="246" y="198" width="66" height="18" rx="9" fill="none" stroke="#fff" stroke-opacity=".8" />
+                <text x="279" y="210" text-anchor="middle" font-size="7.5" fill="#fff">Voir l'agenda</text>
+              </g>
+              <g class="from" style="--a:4.2s">
+                <g clip-path="url(#at-photo)">
+                  <rect x="470" y="96" width="106" height="122" fill="#14111c" />
+                  <path d="M523,96 L494,218 H552 Z" fill="url(#at-spot)" />
+                  <ellipse cx="523" cy="214" rx="30" ry="5" fill="#fff6d8" opacity=".35" />
+                  <circle cx="523" cy="160" r="8" fill="#0b0910" />
+                  <path d="M509,214 C510,184 536,184 537,214 Z" fill="#0b0910" />
+                </g>
+                <rect x="470" y="96" width="106" height="122" rx="8" fill="none" stroke="#fff" stroke-opacity=".6" />
+              </g>
+              <g class="from" style="--a:3.2s">
+                <text x="246" y="254" font-size="12" font-family="Fraunces, serif" font-weight="600" fill="#2b2620">Prochaines dates</text>
+                {dates.map((d, i) => (
+                  <g>
+                    <rect x="246" y={264 + i * 40} width="328" height="32" rx="6" fill="#fff" stroke="#e7e0d4" />
+                    <rect x="246" y={264 + i * 40} width="4" height="32" rx="2" fill="#3a7bbf" />
+                    <rect class="from" style="--a:7.8s" x="246" y={264 + i * 40} width="4" height="32" rx="2" fill="#e58a56" />
+                    <text x="260" y={284 + i * 40} font-size="9" font-weight="600" fill="#2b2620">{d.d}</text>
+                    <text x="310" y={284 + i * 40} font-size="8.5" fill="#6d6458">{d.c}</text>
+                    <text class="until" style="--b:7.8s" x="562" y={284 + i * 40} text-anchor="end" font-size="8" font-weight="600" fill="#3a7bbf">Réserver</text>
+                    <text class="from" style="--a:7.8s" x="562" y={284 + i * 40} text-anchor="end" font-size="8" font-weight="600" fill="#c2593a">Réserver</text>
+                  </g>
+                ))}
+              </g>
+            </g>
+            {blurred && (
+              <g>
+                <rect x="232" y="66" width="356" height="326" fill="#17171c" opacity=".22" />
+                {particles.map((p) => (
+                  <g transform="translate(410 215)">
+                    <circle class="mote" style={`--x:${p.x}px; --y:${p.y}px; animation-delay:${p.d}s`} r="2" fill="#fff" />
+                  </g>
+                ))}
+              </g>
+            )}
+          </g>
+        ))}
+      </g>
+      <rect x="232" y="66" width="356" height="326" rx="8" fill="none" stroke="#e3e3e8" />
+
+      <!-- carte au centre de l'aperçu -->
+      <g class="veil">
+        <rect x="285" y="148" width="250" height="134" rx="14" fill="#fff" />
+
+        <g class="until" style="--b:1s">
+          <text x="410" y="204" text-anchor="middle" font-size="13" font-weight="600" fill="#17171c" style="font-family: var(--font-display)">Votre site prendra forme ici</text>
+          <text x="410" y="222" text-anchor="middle" font-size="8" fill="#4a4a55">Répondez à l'assistant dans la conversation :</text>
+          <text x="410" y="234" text-anchor="middle" font-size="8" fill="#4a4a55">il commence votre site dès votre premier message.</text>
+        </g>
+        <g {...win(1, 1.7)}>
+          <text x="410" y="204" text-anchor="middle" font-size="13" font-weight="600" fill="#17171c" style="font-family: var(--font-display)">L'agent prépare votre site</text>
+          <text x="410" y="222" text-anchor="middle" font-size="8" fill="#4a4a55">Il lit votre message et choisit par quoi commencer.</text>
+        </g>
+
+        {[
+          { a: 1.7, b: 4.8, items: steps },
+          { a: 7.3, b: 8.4, items: [{ ...STEP2, title: 'Tout le site', band: 'all' }] },
+        ].map((turn) => (
+          <g {...win(turn.a, turn.b)}>
+            <rect x="299" y="162" width="28" height="40" rx="5" fill="#f4f4f6" stroke="#e3e3e8" />
+            <rect x="302" y="165" width="22" height="3" rx="1" fill="#e6e6ea" />
+            <rect x="302" y="170" width="22" height="14" rx="1" fill="#e6e6ea" />
+            <rect x="302" y="186" width="22" height="5" rx="1" fill="#e6e6ea" />
+            <rect x="302" y="193" width="22" height="6" rx="1" fill="#e6e6ea" />
+            {turn.items.map((s) => (
+              <g {...win(s.a, s.b)}>
+                {s.band === 'all' && <rect x="302" y="165" width="22" height="34" rx="2" fill="#4b32c3" />}
+                {s.band === 'top' && <rect x="302" y="168" width="22" height="17" rx="2" fill="#4b32c3" />}
+                {s.band === 'mid' && <rect x="313" y="170" width="11" height="14" rx="2" fill="#4b32c3" />}
+                <text x="337" y="190" font-size="13" font-weight="600" fill="#17171c" style="font-family: var(--font-display)">{s.title}</text>
+                <text x="337" y="203" font-size="8.5" fill="#4a4a55">{s.label}</text>
+              </g>
+            ))}
+            <circle class="pulse-dot" cx="340" cy="171" r="2.5" fill="#4b32c3" />
+            <text x="348" y="174" font-size="7" font-weight="600" letter-spacing=".6" fill="#36239a">L'AGENT TRAVAILLE SUR</text>
+            <rect x="299" y="212" width="222" height="3" rx="1.5" fill="#eeebfb" />
+            <g clip-path="url(#at-shimmer)"><rect class="shimmer" x="299" y="212" width="88" height="3" rx="1.5" fill="#4b32c3" /></g>
+            {turn.items.map((s, i) => (
+              <g class="from" style={`--a:${s.a}s`}>
+                <g {...until(s.b)}>
+                  <circle cx="304" cy={230 + i * 15} r="4" fill="none" stroke="#cfc7f5" stroke-width="1.6" />
+                  <circle cx="304" cy={230 + i * 15} r="2" fill="#4b32c3" />
+                  <text x="314" y={233 + i * 15} font-size="8" font-weight="600" fill="#17171c">{s.label}</text>
+                  <text x="521" y={233 + i * 15} text-anchor="end" font-size="7" fill="#5f5f6b">en cours</text>
+                </g>
+                <g {...from(s.b)}>
+                  <circle cx="304" cy={230 + i * 15} r="4.5" fill="#e7f5ec" />
+                  <path d={`M301.8,${230 + i * 15} L303.4,${231.6 + i * 15} L306.4,${228.4 + i * 15}`} fill="none" stroke="#1d6b3a" stroke-width="1.2" stroke-linecap="round" />
+                  <text x="314" y={233 + i * 15} font-size="8" fill="#4a4a55">{s.label}</text>
+                  <text x="521" y={233 + i * 15} text-anchor="end" font-size="7" fill="#5f5f6b">fait</text>
+                </g>
+              </g>
+            ))}
+          </g>
+        ))}
+
+        {[
+          { a: 4.8, b: 5.6, text: '3 changements sur votre site' },
+          { a: 8.4, b: 9.0, text: '1 changement sur votre site' },
+        ].map((r) => (
+          <g {...win(r.a, r.b)}>
+            <circle cx="410" cy="190" r="17" fill="#e7f5ec" />
+            <path d="M402,190.5 L407.5,196 L418,185" fill="none" stroke="#1d6b3a" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" />
+            <text x="410" y="230" text-anchor="middle" font-size="15" font-weight="600" fill="#17171c" style="font-family: var(--font-display)">C'est prêt</text>
+            <text x="410" y="246" text-anchor="middle" font-size="8.5" fill="#4a4a55">{r.text}</text>
+          </g>
+        ))}
+      </g>
+      {[4.8, 8.4].map((t) => (
+        <g transform="translate(410 215)">
+          {sparks.map((s) => (
+            <circle class="spark" style={`--x:${s.x * 3}px; --y:${s.y * 3}px; --t:${t}s`} r="2.2" fill={s.c} />
+          ))}
+        </g>
+      ))}
+
+      <!-- publication -->
+      <g class="from" style="--a:10.1s">
+        <rect x="232" y="66" width="356" height="326" rx="8" fill="#17171c" opacity=".35" />
+        <rect x="285" y="140" width="250" height="150" rx="14" fill="#fff" />
+        <g class="until" style="--b:11.5s">
+          <text x="301" y="166" font-size="13" font-weight="600" fill="#17171c" style="font-family: var(--font-display)">Publication en cours</text>
+          <rect x="301" y="176" width="218" height="4" rx="2" fill="#f0f0f3" />
+          {pubSteps.map((p, i) => (
+            <rect class="grow" style={`--a:${p.a}s`} x={301 + i * 72.7} y="176" width="72.7" height="4" fill="#4b32c3" />
+          ))}
+          {pubSteps.map((p, i) => (
+            <g>
+              <circle cx="305" cy={201 + i * 18} r="3.5" fill="#e3e3e8" />
+              <circle class="from" style={`--a:${p.a}s`} cx="305" cy={201 + i * 18} r="3.5" fill="#cfc7f5" />
+              <circle class="from" style={`--a:${p.b}s`} cx="305" cy={201 + i * 18} r="3.5" fill="#1d6b3a" />
+              <text x="314" y={204 + i * 18} font-size="8.5" fill="#17171c">{p.label}</text>
+              <text class="until" style={`--b:${p.a}s`} x="519" y={204 + i * 18} text-anchor="end" font-size="7.5" fill="#5f5f6b">à venir</text>
+              <text {...win(p.a, p.b)} x="519" y={204 + i * 18} text-anchor="end" font-size="7.5" font-weight="600" fill="#36239a">en cours</text>
+              <text class="from" style={`--a:${p.b}s`} x="519" y={204 + i * 18} text-anchor="end" font-size="7.5" fill="#1d6b3a">terminé</text>
+            </g>
+          ))}
+        </g>
+        <g class="from" style="--a:11.5s">
+          <circle cx="410" cy="182" r="17" fill="#e7f5ec" />
+          <path d="M402,182.5 L407.5,188 L418,177" fill="none" stroke="#1d6b3a" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" />
+          <text x="410" y="222" text-anchor="middle" font-size="14" font-weight="600" fill="#17171c" style="font-family: var(--font-display)">Publication terminée</text>
+          <text x="410" y="238" text-anchor="middle" font-size="8.5" fill="#4a4a55">La version 1 est en ligne.</text>
+          <rect x="358" y="250" width="104" height="22" rx="7" fill="#4b32c3" />
+          <text x="410" y="264" text-anchor="middle" font-size="8.5" font-weight="600" fill="#fff">Voir le site en ligne</text>
+        </g>
+      </g>
+
+      <!-- curseur -->
+      <g class="cursor">
+        <path d="M0,0 L0,15 L4,11.5 L7,18 L9.6,16.8 L6.7,10.5 L11.5,10.2 Z" fill="#17171c" stroke="#fff" stroke-width="1.1" />
+      </g>
+    </g>
+  </svg>
+</div>
+
+<style is:global>
+  @keyframes at-fade { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes at-fadeout { from { opacity: 1; } to { opacity: 0; } }
+  @keyframes at-win { 0% { opacity: 0; } 6%, 94% { opacity: 1; } 100% { opacity: 0; } }
+
+  .at .from { animation: at-fade 0.3s var(--a) ease both; }
+  .at .until { animation: at-fadeout 0.25s var(--b) ease both; }
+  .at .win { opacity: 0; animation: at-win calc(var(--b) - var(--a)) var(--a) linear; }
+
+  .at .ph { animation: at-fadeout 0.1s 0.1s both, at-fade 0.2s 0.95s forwards; }
+  .at .typed { transform-box: fill-box; transform-origin: left; animation: at-type 0.6s 0.15s steps(18) both; }
+  @keyframes at-type { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+
+  .at .press { transform-box: fill-box; transform-origin: center; animation: at-press 0.3s var(--a) ease both; }
+  @keyframes at-press { 50% { transform: scale(.88); } }
+
+  .at .dot { animation: at-blink 1s ease-in-out infinite; }
+  .at .d2 { animation-delay: .15s; }
+  .at .d3 { animation-delay: .3s; }
+  @keyframes at-blink { 50% { opacity: .25; } }
+
+  /* aperçu flouté et carte pendant que l'agent travaille (deux tours) */
+  .at .veil { animation: at-veil 13s linear both; }
+  @keyframes at-veil {
+    0%, 43% { opacity: 1; }
+    45.4%, 56.1% { opacity: 0; }
+    58%, 69.2% { opacity: 1; }
+    71.5%, 100% { opacity: 0; }
+  }
+  .at .mote { opacity: 0; animation: at-mote 1.8s ease-in infinite; }
+  @keyframes at-mote {
+    from { opacity: 0; transform: translate(var(--x), var(--y)); }
+    30% { opacity: .9; }
+    to { opacity: 0; transform: translate(0, 0); }
+  }
+  .at .pulse-dot { transform-box: fill-box; transform-origin: center; animation: at-pulse 1.2s ease-in-out infinite; }
+  @keyframes at-pulse { 50% { transform: scale(1.4); opacity: .55; } }
+  .at .shimmer { animation: at-shimmer 1.4s ease-in-out infinite; }
+  @keyframes at-shimmer { from { transform: translateX(-90px); } to { transform: translateX(230px); } }
+  .at .spark { opacity: 0; animation: at-spark 0.9s var(--t) cubic-bezier(.1,.7,.3,1); }
+  @keyframes at-spark {
+    from { opacity: 1; transform: translate(0, 0); }
+    to { opacity: 0; transform: translate(var(--x), var(--y)); }
+  }
+
+  .at .grow { transform-box: fill-box; transform-origin: left; animation: at-grow 0.4s var(--a) ease-out both; }
+  @keyframes at-grow { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+
+  .at .cursor { opacity: 0; animation: at-cursor 4.4s 6.3s ease-in-out both; }
+  @keyframes at-cursor {
+    0% { opacity: 0; transform: translate(420px, 300px); }
+    3% { opacity: 1; transform: translate(420px, 300px); }
+    13% { transform: translate(162px, 232px); }
+    68% { transform: translate(162px, 232px); }
+    82% { opacity: 1; transform: translate(532px, 19px); }
+    90% { opacity: 1; transform: translate(532px, 19px); }
+    100% { opacity: 0; transform: translate(540px, 40px); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .at .veil, .at .cursor, .at .mote, .at .spark { opacity: 0 !important; }
+  }
+</style>

@@ -1,0 +1,184 @@
+---
+// Zouritebnb : on cherche un logement à Rodrigues, on réserve,
+// et le séjour finance un projet solidaire local.
+const island =
+  'M150,215 C160,180 210,160 260,165 C300,150 350,148 395,160 C430,165 455,185 450,210 C447,235 420,250 385,252 C350,262 300,268 255,258 C205,255 160,245 150,215 Z';
+const pins = [
+  { x: 205, y: 205, price: '27 €' },
+  { x: 272, y: 190, price: '30 €' },
+  { x: 335, y: 222, price: '45 €' },
+  { x: 402, y: 196, price: '30 €' },
+];
+---
+
+<div class="scene zb" id="scene-zouritebnb" data-loop="10500" role="img"
+  aria-label="Animation : la carte de l'île Rodrigues se dessine, des logements apparaissent, un séjour est réservé et un cœur part soutenir le projet solidaire Protection des coraux.">
+  <svg viewBox="0 0 600 400" aria-hidden="true">
+    <defs>
+      <linearGradient id="zb-sea" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#0d2a4a" />
+        <stop offset="1" stop-color="#081a30" />
+      </linearGradient>
+      <linearGradient id="zb-land" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#3f8f5c" />
+        <stop offset="1" stop-color="#2a6a45" />
+      </linearGradient>
+      <linearGradient id="zb-photo" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#58b6c9" />
+        <stop offset="1" stop-color="#1f6b8f" />
+      </linearGradient>
+      <clipPath id="zb-photo-clip"><rect x="0" y="0" width="190" height="44" rx="8" /></clipPath>
+    </defs>
+
+    <rect width="600" height="400" rx="18" fill="url(#zb-sea)" />
+
+    <!-- houle -->
+    <g class="waves" stroke="#2a5d8f" stroke-width="1.5" fill="none" opacity=".55">
+      <path class="wave w1" d="M-60,110 q15,-8 30,0 t30,0 t30,0 t30,0 t30,0 t30,0" />
+      <path class="wave w2" d="M380,320 q15,-8 30,0 t30,0 t30,0 t30,0 t30,0" />
+      <path class="wave w3" d="M40,330 q15,-8 30,0 t30,0 t30,0 t30,0" />
+      <path class="wave w1" d="M470,120 q15,-8 30,0 t30,0 t30,0 t30,0" />
+    </g>
+
+    <!-- lagon et île -->
+    <g class="lagoon">
+      <path d={island} fill="#1f8ea3" opacity=".35"
+        transform="translate(300 208) scale(1.2 1.32) translate(-300 -208)" />
+    </g>
+    <path class="island-fill" d={island} fill="url(#zb-land)" />
+    <path class="island-line" d={island} fill="none" stroke="#e9dcae" stroke-width="2.5" pathLength="1000" />
+    <text class="island-name" x="300" y="236" text-anchor="middle" font-size="11" fill="#d7f0dc" letter-spacing="3">RODRIGUES</text>
+
+    <!-- recherche -->
+    <g transform="translate(20 20)">
+      <g class="search">
+        <rect width="230" height="74" rx="12" fill="#ffffff" />
+        <text x="16" y="24" font-size="9.5" fill="#6b7280" letter-spacing="1.2" font-weight="600">LIEU · DATES · VOYAGEURS</text>
+        <text x="16" y="46" font-size="13" fill="#111827" font-weight="600">Rodrigues · 12 → 15 mars · 2</text>
+        <rect x="16" y="56" width="198" height="5" rx="2.5" fill="#e5e7eb" />
+        <rect class="search-bar" x="16" y="56" width="198" height="5" rx="2.5" fill="#2563eb" />
+      </g>
+    </g>
+
+    <!-- logements -->
+    {pins.map((p, i) => (
+      <g transform={`translate(${p.x} ${p.y})`}>
+        <g class="pin" style={`--d:${2.5 + i * 0.22}s`}><g class={i === 3 ? 'pick' : undefined}>
+          {i === 3 && <circle class="pulse" r="14" cy="-4" fill="none" stroke="#f2675a" stroke-width="2" />}
+          <path d="M0,0 C-8,-11 -11,-16 -11,-21 A11,11 0 1 1 11,-21 C11,-16 8,-11 0,0 Z"
+            fill={i === 3 ? '#f2675a' : '#ffffff'} />
+          <circle cy="-21" r="4" fill={i === 3 ? '#ffffff' : '#2563eb'} />
+          <g transform="translate(0 -44)">
+            <rect x="-20" y="-11" width="40" height="18" rx="9" fill="#111827" opacity=".88" />
+            <text y="2" text-anchor="middle" font-size="10" font-weight="600" fill="#fff">{p.price}</text>
+          </g>
+        </g></g>
+      </g>
+    ))}
+
+    <!-- fiche de réservation -->
+    <g transform="translate(390 264)">
+      <g class="booking">
+        <rect width="190" height="124" rx="12" fill="#ffffff" />
+        <g clip-path="url(#zb-photo-clip)">
+          <rect width="190" height="44" fill="url(#zb-photo)" />
+          <path d="M0,34 q24,-10 48,0 t48,0 t48,0 t48,0 V44 H0 Z" fill="#f3e3b5" />
+          <circle cx="160" cy="14" r="7" fill="#ffe28a" />
+        </g>
+        <text x="12" y="62" font-size="12" font-weight="600" fill="#111827">Villa lagon · Anse Ally</text>
+        <text x="12" y="78" font-size="10.5" fill="#6b7280">3 nuits · 90 €</text>
+        <g transform="translate(118 68)">
+          <g class="book-btn">
+            <rect width="62" height="26" rx="7" fill="#2563eb" />
+            <text x="31" y="17" text-anchor="middle" font-size="10.5" font-weight="600" fill="#fff">Réserver</text>
+          </g>
+        </g>
+        <text class="booked" x="12" y="112" font-size="9.5" font-weight="600" fill="#16a34a">✓ Demande envoyée à l'hôte</text>
+      </g>
+    </g>
+
+    <!-- projet solidaire -->
+    <g transform="translate(400 20)">
+      <g class="cause"><g class="cause-pop">
+        <rect width="180" height="78" rx="12" fill="#1b1220" stroke="#f2675a" stroke-opacity=".5" />
+        <text x="14" y="22" font-size="9" letter-spacing="1.2" fill="#f2a59c" font-weight="600">PROJET SOLIDAIRE</text>
+        <text x="14" y="41" font-size="12.5" font-weight="600" fill="#fff">Protection des coraux</text>
+        <text class="count count-old" x="14" y="63" font-size="11" fill="#c9c4cf">127 séjours solidaires</text>
+        <text class="count count-new" x="14" y="63" font-size="11" fill="#fff" font-weight="600">128 séjours solidaires</text>
+        <g transform="translate(150 66)" stroke="#f2675a" stroke-width="2.4" stroke-linecap="round" fill="none">
+          <path class="coral" pathLength="100" d="M0,0 V-22 M0,-10 L-8,-18 M0,-15 L7,-24 M-8,-18 V-24" />
+        </g>
+      </g></g>
+    </g>
+
+    <!-- le cœur qui part du séjour vers le projet -->
+    <g transform="translate(540 360)">
+      <g class="heart">
+        <path d="M0,4 C-12,-4 -10,-14 -4,-14 C-1,-14 0,-11 0,-10 C0,-11 1,-14 4,-14 C10,-14 12,-4 0,4 Z"
+          fill="#f2675a" />
+      </g>
+    </g>
+  </svg>
+</div>
+
+<style>
+  .zb .wave { animation: zb-wave 6s linear infinite; }
+  .zb .w2 { animation-duration: 8s; animation-direction: reverse; }
+  .zb .w3 { animation-duration: 7s; }
+  @keyframes zb-wave { to { transform: translateX(60px); } }
+
+  .zb .island-line {
+    stroke-dasharray: 1000;
+    animation: zb-draw 1.4s 0.2s cubic-bezier(.6,.1,.3,1) both;
+  }
+  @keyframes zb-draw { from { stroke-dashoffset: 1000; } to { stroke-dashoffset: 0; } }
+
+  .zb .island-fill { animation: zb-fade 0.9s 1s ease both; }
+  .zb .island-name { animation: zb-fade 0.8s 1.5s ease both; }
+  .zb .lagoon { animation: zb-fade 1.2s 1.1s ease both; }
+  @keyframes zb-fade { from { opacity: 0; } to { opacity: 1; } }
+
+  .zb .search { animation: zb-slide-down 0.6s 1.3s cubic-bezier(.2,.8,.2,1.2) both; }
+  @keyframes zb-slide-down { from { opacity: 0; transform: translateY(-16px); } to { opacity: 1; transform: none; } }
+  .zb .search-bar {
+    transform-box: fill-box; transform-origin: left;
+    animation: zb-progress 0.8s 1.8s ease-in-out both;
+  }
+  @keyframes zb-progress { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+
+  .zb .pin { transform-box: fill-box; transform-origin: 50% 100%; animation: zb-drop 0.6s var(--d) cubic-bezier(.3,1.6,.5,1) both; }
+  @keyframes zb-drop {
+    0% { opacity: 0; transform: translateY(-40px) scale(.6); }
+    60% { opacity: 1; }
+    100% { opacity: 1; transform: none; }
+  }
+  .zb .pick { transform-box: fill-box; transform-origin: 50% 100%; animation: zb-pick 0.5s 3.7s ease both; }
+  @keyframes zb-pick { from { transform: none; } to { transform: scale(1.25); } }
+  .zb .pulse { transform-box: fill-box; transform-origin: center; animation: zb-pulse 1.2s 3.7s ease-out 3 both; }
+  @keyframes zb-pulse { from { transform: scale(.6); opacity: .9; } to { transform: scale(2.4); opacity: 0; } }
+
+  .zb .booking { animation: zb-slide-up 0.7s 4.1s cubic-bezier(.2,.8,.2,1.1) both; }
+  @keyframes zb-slide-up { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: none; } }
+  .zb .book-btn { transform-box: fill-box; transform-origin: center; animation: zb-press 0.4s 5.4s ease both; }
+  @keyframes zb-press { 50% { transform: scale(.88); } 100% { transform: scale(1); } }
+  .zb .booked { animation: zb-fade 0.4s 5.7s ease both; }
+
+  .zb .heart { transform-box: fill-box; transform-origin: center; animation: zb-fly 1.5s 5.8s cubic-bezier(.5,0,.3,1) both; }
+  @keyframes zb-fly {
+    0% { opacity: 0; transform: translate(0, 0) scale(.4); }
+    12% { opacity: 1; transform: translate(0, -10px) scale(1.5); }
+    55% { transform: translate(-70px, -170px) scale(1.2); }
+    90% { opacity: 1; transform: translate(-60px, -290px) scale(.8); }
+    100% { opacity: 0; transform: translate(-60px, -300px) scale(.3); }
+  }
+
+  .zb .cause { animation: zb-slide-down 0.6s 0.6s ease both; }
+  .zb .cause-pop { transform-box: fill-box; transform-origin: center; animation: zb-glow 0.8s 7.2s ease both; }
+  @keyframes zb-glow { 0% { transform: none; } 40% { transform: scale(1.06); } 100% { transform: none; } }
+  .zb .count-old { animation: zb-out 0.4s 7.25s ease both; }
+  .zb .count-new { animation: zb-in 0.4s 7.35s ease both; }
+  @keyframes zb-out { to { opacity: 0; transform: translateY(-8px); } }
+  @keyframes zb-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+  .zb .coral { stroke-dasharray: 100; animation: zb-coral 1s 7.4s ease-out both; }
+  @keyframes zb-coral { from { stroke-dashoffset: 100; } to { stroke-dashoffset: 0; } }
+</style>

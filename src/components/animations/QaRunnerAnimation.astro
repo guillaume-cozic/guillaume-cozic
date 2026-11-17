@@ -1,0 +1,285 @@
+---
+// QA Runner : reproduction de l'écran « Campagne » du back-office réel
+// (libellés, couleurs et composants repris de QA-runner/front).
+// Une campagne joue 4 scénarios de recherche de Zouritebnb ; l'agent rapporte
+// ses actions en direct, un KO apparaît, puis l'équipe crée le ticket.
+
+type Kind = 'system' | 'browser' | 'evidence' | 'result' | 'error' | 'done';
+const log: { t: number; kind: Kind; text: string }[] = [
+  { t: 0.3, kind: 'system', text: "Démarrage de l'agent" },
+  { t: 0.8, kind: 'system', text: '4 scénarios à jouer sur qa.zouritebnb.com' },
+  { t: 1.4, kind: 'browser', text: 'Chromium · ouvre /accommodations' },
+  { t: 2.0, kind: 'browser', text: 'Chromium · remplit le formulaire (Où, Voyageurs)' },
+  { t: 2.6, kind: 'browser', text: 'Chromium · clique sur « Rechercher »' },
+  { t: 3.1, kind: 'evidence', text: 'Chromium · prend une capture' },
+  { t: 3.6, kind: 'result', text: 'REC-A-02 · OK' },
+  { t: 4.3, kind: 'browser', text: 'Chromium · clique sur « Wi-Fi »' },
+  { t: 4.9, kind: 'result', text: 'REC-C-07 · OK' },
+  { t: 5.5, kind: 'browser', text: 'Chromium · choisit une option' },
+  { t: 6.0, kind: 'evidence', text: 'Chromium · prend une capture' },
+  { t: 6.5, kind: 'error', text: 'REC-E-02 · KO' },
+  { t: 7.1, kind: 'result', text: 'REC-G-01 · OK' },
+  { t: 7.6, kind: 'system', text: 'Envoi du rapport final' },
+  { t: 8.1, kind: 'done', text: 'Rapport accepté' },
+];
+const KIND_FILL: Record<Kind, string> = {
+  system: '#a9b8d0',
+  browser: '#c9d4e5',
+  evidence: '#60a5fa',
+  result: '#ffffff',
+  error: '#fca5a5',
+  done: '#6ee7b7',
+};
+const LINE_H = 15;
+const VISIBLE = 6;
+const LOOP = 12;
+
+const pct = (t: number) => ((t / LOOP) * 100).toFixed(2);
+let scroll = '0% { transform: translateY(0); }';
+log.forEach((l, i) => {
+  if (i < VISIBLE) return;
+  const before = -(i - VISIBLE) * LINE_H;
+  const after = -(i - VISIBLE + 1) * LINE_H;
+  scroll += ` ${pct(l.t)}% { transform: translateY(${before}px); } ${pct(l.t + 0.25)}% { transform: translateY(${after}px); }`;
+});
+scroll += ` 100% { transform: translateY(${-(log.length - VISIBLE) * LINE_H}px); }`;
+const scrollCss = `@keyframes qr-scroll { ${scroll} } .qr .loglines { animation: qr-scroll ${LOOP}s linear both; }`;
+
+const time = (t: number) => {
+  const s = 12 + Math.round(t * 4);
+  return `14:0${2 + Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+};
+
+// Compteur qui change de valeur à des instants donnés
+type Tick = { v: string; cls: string; style: string };
+function ticker(steps: [string, number][]): Tick[] {
+  return steps.map(([v, t], i) => {
+    const next = steps[i + 1]?.[1];
+    if (i === 0) return next === undefined ? { v, cls: '', style: '' } : { v, cls: 'tk-first', style: `--o:${next}s` };
+    if (next === undefined) return { v, cls: 'tk-last', style: `--t:${t}s` };
+    return { v, cls: 'tk-mid', style: `--t:${t}s; --l:${next - t}s` };
+  });
+}
+const reported = ticker([['0', 0], ['1', 3.7], ['2', 5.0], ['3', 6.6], ['4', 7.2]]);
+const tiles = [
+  { label: 'OK', w: 22, bg: '#e3f5ec', fg: '#146c43', values: ticker([['0', 0], ['1', 3.7], ['2', 5.0], ['3', 7.2]]) },
+  { label: 'KO', w: 22, bg: '#fdeceb', fg: '#b42318', values: ticker([['0', 0], ['1', 6.6]]) },
+  { label: 'BLOQUÉ', w: 42, bg: '#fff1dc', fg: '#8a4b00', values: ticker([['0', 0]]) },
+  { label: 'NON JOUÉ', w: 50, bg: '#edf0f4', fg: '#475467', values: ticker([['4', 0], ['3', 3.7], ['2', 5.0], ['1', 6.6], ['0', 7.2]]) },
+];
+
+const rows = [
+  { id: 'REC-A-02', title: 'Recherche par ville', ok: true, observed: '3 hébergements à Port Mathurin', t: 3.7 },
+  { id: 'REC-C-07', title: 'Filtre Wi-Fi', ok: true, observed: '8 annonces, toutes avec Wi-Fi', t: 5.0 },
+  { id: 'REC-E-02', title: 'Tri par prix croissant', ok: false, observed: '45 € affiché avant 30 €', t: 6.6 },
+  { id: 'REC-G-01', title: 'Marqueurs de la carte', ok: true, observed: '1 marqueur par annonce', t: 7.2 },
+];
+---
+
+<div class="scene qr" id="scene-qarunner" data-loop="12500" role="img"
+  aria-label="Animation de l'écran Campagne de QA Runner : l'agent joue quatre scénarios de recherche de Zouritebnb, son activité défile en direct, les compteurs OK et KO montent, un scénario échoue, puis on crée le ticket correspondant.">
+  <style is:inline set:html={scrollCss}></style>
+  <svg viewBox="0 0 600 400" aria-hidden="true">
+    <defs>
+      <clipPath id="qr-frame"><rect width="600" height="400" rx="18" /></clipPath>
+      <clipPath id="qr-log"><rect x="136" y="292" width="448" height="92" /></clipPath>
+    </defs>
+
+    <g clip-path="url(#qr-frame)">
+      <rect width="600" height="400" fill="#f3f5f9" />
+
+      <!-- barre latérale -->
+      <rect width="120" height="400" fill="#0a1628" />
+      <line x1="120" x2="120" y2="400" stroke="#1b2f52" />
+      <rect x="12" y="16" width="24" height="24" rx="6" fill="#2563eb" />
+      <text x="24" y="31.5" text-anchor="middle" font-size="8.5" font-weight="700" fill="#fff">QA</text>
+      <text x="42" y="26" font-size="9.5" font-weight="600" fill="#fff">QA Runner</text>
+      <text x="42" y="37" font-size="7.5" fill="#8ea0bc">Back-office QA</text>
+
+      <text x="16" y="66" font-size="7" font-weight="600" letter-spacing=".8" fill="#7d8fad">PILOTAGE</text>
+      <g font-size="8.5">
+        <g transform="translate(8 74)">
+          <path d="M8,15 V10 M12,15 V6 M16,15 V8" stroke="#c9d4e5" stroke-width="1.4" stroke-linecap="round" />
+          <text x="24" y="13.5" fill="#c9d4e5">Tableau de bord</text>
+        </g>
+        <g transform="translate(8 96)">
+          <path d="M12,5 L17,8 L12,11 L7,8 Z M7,11 L12,14 L17,11" fill="none" stroke="#c9d4e5" stroke-width="1.2" stroke-linejoin="round" />
+          <text x="24" y="13.5" fill="#c9d4e5">Projets</text>
+        </g>
+        <g transform="translate(8 118)">
+          <rect width="104" height="20" rx="5" fill="#16305a" />
+          <rect width="2.5" height="20" fill="#2563eb" />
+          <path d="M9,5.5 L16,10 L9,14.5 Z" fill="#fff" />
+          <text x="24" y="13.5" fill="#fff" font-weight="600">Campagnes</text>
+          <g class="nav-badge">
+            <rect x="84" y="4" width="14" height="12" rx="6" fill="#2563eb" />
+            <text x="91" y="12.6" text-anchor="middle" font-size="7.5" font-weight="600" fill="#fff">1</text>
+          </g>
+        </g>
+      </g>
+      <circle cx="22" cy="378" r="8" fill="#16305a" />
+      <text x="22" y="381" text-anchor="middle" font-size="7.5" font-weight="600" fill="#bfd3f5">ÉQ</text>
+      <text x="36" y="381" font-size="8" fill="#c9d4e5">Équipe QA</text>
+
+      <!-- en-tête de page -->
+      <text x="136" y="24" font-size="8" fill="#556173">Campagnes  ›  Zouritebnb</text>
+      <text x="136" y="44" font-size="15" font-weight="700" fill="#0f1b2d">Campagne Zouritebnb</text>
+      <g transform="translate(300 34)">
+        <g class="st-running">
+          <rect width="56" height="16" rx="8" fill="#e8effe" />
+          <circle class="st-dot" cx="9" cy="8" r="3" fill="#2563eb" />
+          <text x="16" y="11.2" font-size="8" font-weight="600" fill="#1d4ed8">En cours</text>
+        </g>
+        <g class="st-done">
+          <rect width="58" height="16" rx="8" fill="#e3f5ec" />
+          <circle cx="9" cy="8" r="3" fill="#146c43" />
+          <text x="16" y="11.2" font-size="8" font-weight="600" fill="#146c43">Terminée</text>
+        </g>
+      </g>
+      <text x="136" y="60" font-size="8" class="m" fill="#344054">QA/04-bnb-recherche.md</text>
+
+      <g class="act-running">
+        <rect x="486" y="30" width="98" height="20" rx="6" fill="#fff" stroke="#f3c4bf" />
+        <text x="535" y="43" text-anchor="middle" font-size="8" font-weight="600" fill="#b42318">Annuler la campagne</text>
+      </g>
+      <g class="act-done">
+        <rect x="430" y="30" width="56" height="20" rx="6" fill="#fff" stroke="#d5dce7" />
+        <text x="458" y="43" text-anchor="middle" font-size="8" font-weight="600" fill="#0f1b2d">Galerie (6)</text>
+        <g transform="translate(537 40)">
+          <g class="issue-btn">
+            <rect x="-45" y="-10" width="90" height="20" rx="6" fill="#fff" stroke="#d5dce7" />
+            <text y="3" text-anchor="middle" font-size="8" font-weight="600" fill="#0f1b2d">Créer les tickets</text>
+          </g>
+        </g>
+      </g>
+
+      <!-- progression et compteurs -->
+      <rect x="136" y="70" width="134" height="66" rx="10" fill="#0f2240" />
+      <text x="148" y="86" font-size="8" fill="#a9b8d0">Scénarios rapportés</text>
+      {reported.map((r) => (
+        <text class={r.cls} style={r.style} x="148" y="113" font-size="24" font-weight="700" fill="#fff">{r.v}</text>
+      ))}
+      <text x="166" y="113" font-size="12" font-weight="500" fill="#a9b8d0">/ 4</text>
+      <rect x="148" y="122" width="110" height="5" rx="2.5" fill="#1e3a66" />
+      {[3.7, 5.0, 6.6, 7.2].map((t, i) => (
+        <rect class="prog" style={`--t:${t}s`} x={148 + i * 27.5} y="122" width="27.5" height="5" fill="#60a5fa" />
+      ))}
+
+      {tiles.map((tile, i) => (
+        <g transform={`translate(${278 + i * 77.5} 70)`}>
+          <rect width="70" height="66" rx="10" fill="#fff" stroke="#e2e7ef" />
+          <rect x="10" y="11" width={tile.w} height="14" rx="4" fill={tile.bg} />
+          <text x={10 + tile.w / 2} y="21" text-anchor="middle" font-size="7.5" font-weight="700" fill={tile.fg}>{tile.label}</text>
+          {tile.values.map((v) => (
+            <text class={v.cls} style={v.style} x="10" y="52" font-size="20" font-weight="700" fill="#0f1b2d">{v.v}</text>
+          ))}
+        </g>
+      ))}
+
+      <!-- résultats -->
+      <rect x="136" y="146" width="448" height="116" rx="10" fill="#fff" stroke="#e2e7ef" />
+      <text x="148" y="162" font-size="9" font-weight="600" fill="#0f1b2d">Résultats</text>
+      <rect x="137" y="168" width="446" height="13" fill="#f8fafc" />
+      <g font-size="6.5" font-weight="600" letter-spacing=".5" fill="#556173">
+        <text x="148" y="177">SCÉNARIO</text>
+        <text x="318" y="177">STATUT</text>
+        <text x="372" y="177">OBSERVÉ</text>
+        <text x="540" y="177">CAPTURES</text>
+      </g>
+      {rows.map((r, i) => (
+        <g class="row" style={`--t:${r.t}s`}>
+          <line x1="137" x2="583" y1={181 + i * 20} y2={181 + i * 20} stroke="#eef1f6" />
+          <text x="148" y={194 + i * 20} font-size="7.5" class="m" fill="#556173">{r.id}</text>
+          <text x="196" y={194 + i * 20} font-size="8" font-weight="600" fill="#1d4ed8">{r.title}</text>
+          <rect x="318" y={185 + i * 20} width="20" height="12" rx="3" fill={r.ok ? '#e3f5ec' : '#fdeceb'} />
+          <text x="328" y={193.5 + i * 20} text-anchor="middle" font-size="7" font-weight="700" fill={r.ok ? '#146c43' : '#b42318'}>{r.ok ? 'OK' : 'KO'}</text>
+          <text x="372" y={194 + i * 20} font-size="8" fill="#344054">{r.observed}</text>
+          <rect x="540" y={185 + i * 20} width="16" height="11" rx="2" fill="#dbe4f3" />
+          <rect x="559" y={185 + i * 20} width="16" height="11" rx="2" fill={r.ok ? '#dbe4f3' : '#f3c4bf'} />
+          {!r.ok && (
+            <g transform={`translate(342 ${185 + i * 20})`}><g class="issue">
+              <rect width="24" height="12" rx="6" fill="#0f2240" />
+              <text x="12" y="8.6" text-anchor="middle" font-size="7" font-weight="600" fill="#fff">#31</text>
+            </g></g>
+          )}
+        </g>
+      ))}
+
+      <!-- activité de l'agent -->
+      <rect x="136" y="270" width="448" height="120" rx="10" fill="#0a1628" />
+      <text x="148" y="285" font-size="9" font-weight="600" fill="#fff">Activité de l'agent</text>
+      <rect x="470" y="275" width="104" height="15" rx="4" fill="#0f2240" />
+      <rect x="472" y="277" width="42" height="11" rx="3" fill="#16305a" />
+      <text x="493" y="285" text-anchor="middle" font-size="7" font-weight="600" fill="#fff">Activité</text>
+      <text x="544" y="285" text-anchor="middle" font-size="7" font-weight="600" fill="#a9b8d0">Journal brut</text>
+      <line x1="136" x2="584" y1="292" y2="292" stroke="#1b2f52" />
+      <g clip-path="url(#qr-log)">
+        <g class="loglines">
+          {log.map((l, i) => (
+            <g class="logline" style={`--t:${l.t}s`}>
+              <text x="148" y={306 + i * LINE_H} font-size="7.5" class="m" fill="#7d8fad">{time(l.t)}</text>
+              <text x="190" y={306 + i * LINE_H} font-size="8"
+                font-weight={l.kind === 'result' || l.kind === 'done' || l.kind === 'error' ? 600 : 400}
+                fill={KIND_FILL[l.kind]}>{l.text}</text>
+            </g>
+          ))}
+        </g>
+      </g>
+
+      <!-- curseur qui crée le ticket -->
+      <g class="cursor">
+        <path d="M0,0 L0,15 L4,11.5 L7,18 L9.6,16.8 L6.7,10.5 L11.5,10.2 Z" fill="#0f1b2d" stroke="#fff" stroke-width="1.1" />
+      </g>
+      <circle class="ripple" cx="537" cy="40" r="10" fill="none" stroke="#2563eb" stroke-width="2" />
+      <g class="toast">
+        <rect x="402" y="56" width="182" height="22" rx="7" fill="#0f2240" />
+        <circle cx="416" cy="67" r="4.5" fill="#6ee7b7" />
+        <text x="426" y="70" font-size="8" fill="#fff">Ticket #31 créé pour REC-E-02</text>
+      </g>
+    </g>
+  </svg>
+</div>
+
+<style is:global>
+  @keyframes qr-on { 0%, 100% { opacity: 1; } }
+  @keyframes qr-fade { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes qr-fadeout { from { opacity: 1; } to { opacity: 0; } }
+  @keyframes qr-rise { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+  @keyframes qr-pop { from { opacity: 0; transform: scale(.3); } to { opacity: 1; transform: none; } }
+
+  /* compteurs */
+  .qr .tk-first { animation: qr-fadeout 0.15s var(--o) both; }
+  .qr .tk-mid { opacity: 0; animation: qr-on var(--l) var(--t) linear; }
+  .qr .tk-last { animation: qr-fade 0.15s var(--t) both; }
+
+  .qr .prog { transform-box: fill-box; transform-origin: left; animation: qr-grow 0.35s var(--t) ease-out both; }
+  @keyframes qr-grow { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+
+  .qr .row { animation: qr-rise 0.35s var(--t) ease both; }
+  .qr .logline { animation: qr-fade 0.25s var(--t) ease both; }
+
+  /* statut de la campagne */
+  .qr .st-dot { transform-box: fill-box; transform-origin: center; animation: qr-blink 1s ease-in-out infinite; }
+  @keyframes qr-blink { 50% { opacity: .3; } }
+  .qr .st-running { animation: qr-fadeout 0.2s 8.3s both; }
+  .qr .st-done { animation: qr-fade 0.3s 8.35s both; }
+  .qr .nav-badge { animation: qr-fadeout 0.3s 8.3s both; }
+  .qr .act-running { animation: qr-fadeout 0.2s 8.4s both; }
+  .qr .act-done { animation: qr-fade 0.3s 8.5s both; }
+
+  /* création du ticket */
+  .qr .cursor { opacity: 0; animation: qr-cursor 1.6s 8.7s ease-in-out both; }
+  @keyframes qr-cursor {
+    0% { opacity: 0; transform: translate(470px, 150px); }
+    10% { opacity: 1; transform: translate(470px, 150px); }
+    55% { transform: translate(540px, 43px); }
+    80% { opacity: 1; transform: translate(540px, 43px); }
+    100% { opacity: 0; transform: translate(560px, 70px); }
+  }
+  .qr .issue-btn { transform-box: fill-box; transform-origin: center; animation: qr-press 0.3s 9.6s ease both; }
+  @keyframes qr-press { 50% { transform: scale(.92); } }
+  .qr .ripple { opacity: 0; transform-box: fill-box; transform-origin: center; animation: qr-ripple 0.6s 9.6s ease-out; }
+  @keyframes qr-ripple { from { opacity: .9; transform: scale(.3); } to { opacity: 0; transform: scale(2.6); } }
+  .qr .toast { animation: qr-rise 0.35s 9.9s ease both; }
+  .qr .issue { transform-box: fill-box; transform-origin: center; animation: qr-pop 0.4s 10s cubic-bezier(.3,1.6,.5,1) both; }
+</style>

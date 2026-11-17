@@ -1,0 +1,223 @@
+---
+interface Props {
+  id: string;
+  index: string;
+  kicker: string;
+  name: string;
+  tagline: string;
+  period: string;
+  description: string;
+  ai: string[];
+  stack: string[];
+  problem: string;
+  answer: string;
+  accent: string;
+  sceneId: string;
+  reverse?: boolean;
+}
+
+const { id, index, kicker, name, tagline, period, description, ai, stack, problem, answer, accent, sceneId, reverse } =
+  Astro.props;
+---
+
+<section id={id} class:list={['project', { reverse }]} style={`--accent: ${accent}`}>
+  <div class="container grid">
+    <div class="stage reveal">
+      <div class="stage-frame">
+        <slot />
+      </div>
+      <button class="replay" type="button" data-replay={sceneId}>
+        <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
+          <path d="M13.5 8a5.5 5.5 0 1 1-1.6-3.9M13.5 2v3.5H10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+        Rejouer l'animation
+      </button>
+    </div>
+
+    <div class="text">
+      <p class="eyebrow reveal"><span class="idx">{index}</span> {kicker}</p>
+      <h2 class="reveal">{name}</h2>
+      <p class="tagline reveal">{tagline}</p>
+      <p class="period mono reveal">{period}</p>
+      <p class="desc reveal">{description}</p>
+
+      <dl class="pb reveal">
+        <div class="pb-problem">
+          <dt>Le problème</dt>
+          <dd>{problem}</dd>
+        </div>
+        <div class="pb-answer">
+          <dt>La réponse</dt>
+          <dd>{answer}</dd>
+        </div>
+      </dl>
+
+      <details class="ai reveal" open>
+        <summary>Ce que l'IA a changé</summary>
+        <ul>
+          {ai.map((item) => <li>{item}</li>)}
+        </ul>
+      </details>
+
+      <ul class="stack reveal" aria-label="Technologies">
+        {stack.map((t) => <li>{t}</li>)}
+      </ul>
+    </div>
+  </div>
+</section>
+
+<style>
+  .project {
+    padding: clamp(72px, 12vw, 140px) 0;
+    border-top: 1px solid var(--line);
+    position: relative;
+    overflow: hidden;
+  }
+  .project::before {
+    content: '';
+    position: absolute;
+    inset: -20% -10% auto auto;
+    width: 60vw;
+    height: 60vw;
+    background: radial-gradient(closest-side, color-mix(in srgb, var(--accent) 14%, transparent), transparent);
+    pointer-events: none;
+  }
+  .project.reverse::before { inset: auto auto -20% -10%; }
+
+  .grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+    gap: clamp(32px, 5vw, 72px);
+    align-items: center;
+    position: relative;
+  }
+  .reverse .grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); }
+  .reverse .stage { order: 2; }
+
+  .stage { position: sticky; top: 96px; align-self: start; }
+  .stage-frame {
+    border-radius: 22px;
+    padding: 6px;
+    background: linear-gradient(140deg, color-mix(in srgb, var(--accent) 55%, transparent), transparent 45%), var(--panel);
+    box-shadow: 0 30px 80px -30px color-mix(in srgb, var(--accent) 40%, transparent);
+  }
+  .replay {
+    margin: 14px auto 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: none;
+    border: 1px solid var(--line);
+    color: var(--ink-2);
+    border-radius: 999px;
+    padding: 7px 14px;
+    font: 500 0.82rem var(--font-body);
+    cursor: pointer;
+    transition: color .2s, border-color .2s;
+  }
+  .replay:hover { color: var(--accent); border-color: var(--accent); }
+  .replay:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  .idx { color: var(--accent); }
+  h2 {
+    font-size: clamp(2.6rem, 6vw, 4.2rem);
+    letter-spacing: -0.03em;
+    margin: 10px 0 14px;
+  }
+  .tagline {
+    font-size: clamp(1.15rem, 2vw, 1.35rem);
+    line-height: 1.45;
+    margin: 0 0 10px;
+    color: var(--ink);
+  }
+  .period { color: var(--accent); font-size: 0.85rem; margin: 0 0 18px; }
+  .desc { color: var(--ink-2); margin: 0 0 26px; }
+
+  .pb {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    margin: 0 0 26px;
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    overflow: hidden;
+    background: color-mix(in srgb, var(--panel) 70%, transparent);
+  }
+  .pb > div { padding: 16px 18px; }
+  .pb-answer {
+    border-left: 1px solid var(--line);
+    background: color-mix(in srgb, var(--accent) 9%, transparent);
+    position: relative;
+  }
+  .pb-answer::before {
+    content: '→';
+    position: absolute;
+    left: -11px;
+    top: 16px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    font-size: 0.75rem;
+    background: var(--accent);
+    color: var(--bg);
+  }
+  .pb dt {
+    font: 600 0.72rem var(--font-mono);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    margin-bottom: 6px;
+  }
+  .pb-answer dt { color: var(--accent); }
+  .pb dd { margin: 0; font-size: 0.93rem; line-height: 1.5; color: var(--ink-2); }
+  .pb-answer dd { color: var(--ink); }
+
+  .ai {
+    border-left: 2px solid var(--accent);
+    padding: 4px 0 4px 18px;
+    margin-bottom: 24px;
+  }
+  .ai summary {
+    cursor: pointer;
+    font: 600 1rem var(--font-display);
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .ai summary::-webkit-details-marker { display: none; }
+  .ai summary::after { content: '+'; color: var(--accent); transition: transform .2s; }
+  .ai[open] summary::after { transform: rotate(45deg); }
+  .ai ul { margin: 12px 0 0; padding: 0; list-style: none; display: grid; gap: 10px; }
+  .ai li { color: var(--ink-2); font-size: 0.95rem; padding-left: 18px; position: relative; }
+  .ai li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.62em;
+    width: 7px;
+    height: 7px;
+    border-radius: 2px;
+    background: var(--accent);
+    transform: rotate(45deg);
+  }
+
+  .stack { display: flex; flex-wrap: wrap; gap: 8px; padding: 0; margin: 0; list-style: none; }
+  .stack li {
+    font: 500 0.78rem var(--font-mono);
+    padding: 5px 10px;
+    border-radius: 999px;
+    border: 1px solid var(--line);
+    color: var(--ink-2);
+  }
+
+  @media (max-width: 900px) {
+    .grid, .reverse .grid { grid-template-columns: minmax(0, 1fr); }
+    .reverse .stage { order: 0; }
+    .stage { position: static; }
+    .pb { grid-template-columns: minmax(0, 1fr); }
+    .pb-answer { border-left: 0; border-top: 1px solid var(--line); }
+    .pb-answer::before { left: 18px; top: -11px; content: '↓'; }
+  }
+</style>
