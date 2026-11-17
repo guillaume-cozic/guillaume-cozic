@@ -46,7 +46,7 @@ const method = [
         <a href="#zouritebnb" data-nav="zouritebnb">Zouritebnb</a>
         <a href="#methode" data-nav="methode">Méthode</a>
       </nav>
-      <a class="topbar-cv" href="/CV_Guillaume_Cozic_Product_Engineer.pdf" download><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11M7 10l5 5 5-5M5 20h14" /></svg><span>CV PDF</span></a>
+      <a class="topbar-cv" href={`${import.meta.env.BASE_URL}CV_Guillaume_Cozic_Product_Engineer.pdf`} download><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11M7 10l5 5 5-5M5 20h14" /></svg><span>CV PDF</span></a>
     </div>
   </header>
 
@@ -75,11 +75,11 @@ const method = [
               <li><a href="https://malt.fr/profile/guillaumecozic" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 14a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1" /><path d="M14 10a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1" /></svg>malt.fr/profile/guillaumecozic</a></li>
               <li><a class="accent-link" href="https://www.zouritebnb.com" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" /><path d="M3 12h18M12 3c3 3.5 3 14.5 0 18M12 3c-3 3.5-3 14.5 0 18" /></svg>www.zouritebnb.com</a></li>
             </ul>
-            <a class="download reveal" href="/CV_Guillaume_Cozic_Product_Engineer.pdf" download><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11M7 10l5 5 5-5M5 20h14" /></svg>Télécharger mon CV <span>PDF · 364 Ko</span></a>
+            <a class="download reveal" href={`${import.meta.env.BASE_URL}CV_Guillaume_Cozic_Product_Engineer.pdf`} download><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11M7 10l5 5 5-5M5 20h14" /></svg>Télécharger mon CV <span>PDF · 364 Ko</span></a>
           </div>
           <figure class="portrait reveal">
             <span class="portrait-ring" aria-hidden="true"></span>
-            <img src="/guillaume-cozic.png" width="360" height="360" alt="Portrait de Guillaume Cozic" />
+            <img src={`${import.meta.env.BASE_URL}guillaume-cozic.png`} width="360" height="360" alt="Portrait de Guillaume Cozic" />
           </figure>
         </div>
 
