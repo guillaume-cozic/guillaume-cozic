@@ -21,37 +21,43 @@ const { id, index, kicker, name, tagline, period, description, ai, stack, proble
 ---
 
 <section id={id} class:list={['project', { reverse }]} style={`--accent: ${accent}`}>
-  <div class="container grid">
-    <div class="stage reveal">
-      <div class="stage-frame">
-        <slot />
+  <div class="container">
+    <!-- Ligne 1 : animation | explication -->
+    <div class="top">
+      <div class="stage reveal">
+        <div class="stage-frame">
+          <slot />
+        </div>
+        <button class="replay" type="button" data-replay={sceneId}>
+          <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
+            <path d="M13.5 8a5.5 5.5 0 1 1-1.6-3.9M13.5 2v3.5H10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+          Rejouer l'animation
+        </button>
       </div>
-      <button class="replay" type="button" data-replay={sceneId}>
-        <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
-          <path d="M13.5 8a5.5 5.5 0 1 1-1.6-3.9M13.5 2v3.5H10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
-        </svg>
-        Rejouer l'animation
-      </button>
+
+      <div class="text">
+        <p class="eyebrow reveal"><span class="idx">{index}</span> {kicker}</p>
+        <h2 class="reveal">{name}</h2>
+        <p class="tagline reveal">{tagline}</p>
+        <p class="period mono reveal">{period}</p>
+        <p class="desc reveal">{description}</p>
+      </div>
     </div>
 
-    <div class="text">
-      <p class="eyebrow reveal"><span class="idx">{index}</span> {kicker}</p>
-      <h2 class="reveal">{name}</h2>
-      <p class="tagline reveal">{tagline}</p>
-      <p class="period mono reveal">{period}</p>
-      <p class="desc reveal">{description}</p>
+    <!-- Ligne 2 : problème | solution, puis le reste -->
+    <dl class="pb reveal">
+      <div class="pb-problem">
+        <dt>Le problème</dt>
+        <dd>{problem}</dd>
+      </div>
+      <div class="pb-answer">
+        <dt>La solution</dt>
+        <dd>{answer}</dd>
+      </div>
+    </dl>
 
-      <dl class="pb reveal">
-        <div class="pb-problem">
-          <dt>Le problème</dt>
-          <dd>{problem}</dd>
-        </div>
-        <div class="pb-answer">
-          <dt>La réponse</dt>
-          <dd>{answer}</dd>
-        </div>
-      </dl>
-
+    <div class="below">
       <details class="ai reveal" open>
         <summary>Ce que l'IA a changé</summary>
         <ul>
@@ -84,17 +90,19 @@ const { id, index, kicker, name, tagline, period, description, ai, stack, proble
   }
   .project.reverse::before { inset: auto auto -20% -10%; }
 
-  .grid {
+  /* Ligne 1 : animation | explication */
+  .top {
     display: grid;
-    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     gap: clamp(32px, 5vw, 72px);
     align-items: center;
     position: relative;
+    margin-bottom: clamp(48px, 7vw, 80px);
   }
-  .reverse .grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); }
+  .reverse .top { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
   .reverse .stage { order: 2; }
 
-  .stage { position: sticky; top: 96px; align-self: start; }
+  .stage { align-self: start; }
   .stage-frame {
     border-radius: 22px;
     padding: 6px;
@@ -131,18 +139,19 @@ const { id, index, kicker, name, tagline, period, description, ai, stack, proble
     color: var(--ink);
   }
   .period { color: var(--accent); font-size: 0.85rem; margin: 0 0 18px; }
-  .desc { color: var(--ink-2); margin: 0 0 26px; }
+  .desc { color: var(--ink-2); margin: 0; }
 
+  /* Ligne 2 : problème | solution */
   .pb {
     display: grid;
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    margin: 0 0 26px;
+    margin: 0 0 40px;
     border: 1px solid var(--line);
     border-radius: 16px;
     overflow: hidden;
     background: color-mix(in srgb, var(--panel) 70%, transparent);
   }
-  .pb > div { padding: 16px 18px; }
+  .pb > div { padding: 20px 24px; }
   .pb-answer {
     border-left: 1px solid var(--line);
     background: color-mix(in srgb, var(--accent) 9%, transparent);
@@ -152,7 +161,7 @@ const { id, index, kicker, name, tagline, period, description, ai, stack, proble
     content: '→';
     position: absolute;
     left: -11px;
-    top: 16px;
+    top: 20px;
     width: 20px;
     height: 20px;
     border-radius: 50%;
@@ -170,13 +179,15 @@ const { id, index, kicker, name, tagline, period, description, ai, stack, proble
     margin-bottom: 6px;
   }
   .pb-answer dt { color: var(--accent); }
-  .pb dd { margin: 0; font-size: 0.93rem; line-height: 1.5; color: var(--ink-2); }
+  .pb dd { margin: 0; font-size: 0.97rem; line-height: 1.55; color: var(--ink-2); }
   .pb-answer dd { color: var(--ink); }
+
+  /* Reste : IA + stack */
+  .below { display: grid; gap: 28px; }
 
   .ai {
     border-left: 2px solid var(--accent);
     padding: 4px 0 4px 18px;
-    margin-bottom: 24px;
   }
   .ai summary {
     cursor: pointer;
@@ -213,11 +224,10 @@ const { id, index, kicker, name, tagline, period, description, ai, stack, proble
   }
 
   @media (max-width: 900px) {
-    .grid, .reverse .grid { grid-template-columns: minmax(0, 1fr); }
+    .top, .reverse .top { grid-template-columns: minmax(0, 1fr); }
     .reverse .stage { order: 0; }
-    .stage { position: static; }
     .pb { grid-template-columns: minmax(0, 1fr); }
     .pb-answer { border-left: 0; border-top: 1px solid var(--line); }
-    .pb-answer::before { left: 18px; top: -11px; content: '↓'; }
+    .pb-answer::before { left: 20px; top: -11px; content: '↓'; }
   }
 </style>

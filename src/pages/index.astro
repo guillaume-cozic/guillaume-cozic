@@ -5,6 +5,7 @@ import ZouriteAnimation from '../components/animations/ZouriteAnimation.astro';
 import QaRunnerAnimation from '../components/animations/QaRunnerAnimation.astro';
 import AttelyaAnimation from '../components/animations/AttelyaAnimation.astro';
 import ButterflyAnimation from '../components/animations/ButterflyAnimation.astro';
+import ButterflyFlow from '../components/ButterflyFlow.astro';
 
 const softSkills = [
   { title: 'Pédagogie', text: 'Expliquer simplement des choix techniques à des non-techniciens.' },
@@ -13,28 +14,45 @@ const softSkills = [
   { title: 'Collégialité', text: "Entre collègues techniques, j'aime que l'on prenne les décisions de manière collégiale." },
 ];
 
-const method = [
+// Schéma « garde-fous » : 02 en amont, 01/03/04 en contrôle, 05 sur la durée
+const harnais = {
+  num: '01',
+  step: 'Un harnais : skills et Spec Kit',
+  text: "Des skills guident l'IA vers un code hexagonal de qualité, couche par couche. Avec Spec Kit (spec-driven development), l'agent a une vision d'ensemble de ce qu'il va construire avant d'écrire une ligne.",
+  tools: ['Skills Claude Code', 'Spec Kit'],
+};
+
+const gardeFous = [
   {
+    num: '02',
+    accent: 'var(--qa)',
     step: 'Des tests unitaires solides',
     text: "L'architecture hexagonale isole le métier : les tests unitaires couvrent chaque fonctionnalité et bloquent les régressions d'une itération à l'autre avec l'IA.",
     tools: ['Architecture hexagonale', 'Tests unitaires'],
   },
   {
-    step: 'Un harnais : skills et Spec Kit',
-    text: "Des skills guident l'IA vers un code hexagonal de qualité, couche par couche. Avec Spec Kit (spec-driven development), l'agent a une vision d'ensemble de ce qu'il va construire avant d'écrire une ligne.",
-    tools: ['Skills Claude Code', 'Spec Kit'],
-  },
-  {
+    num: '03',
+    accent: 'var(--bf)',
     step: 'Des checks déterministes',
     text: "Des règles vérifiées par des outils, pas par l'IA : PHPArkitect contrôle que les couches domaine, application et infrastructure ne sont jamais mélangées, PHPStan traque erreurs et code smells.",
     tools: ['PHPArkitect', 'PHPStan', 'dependency-cruiser'],
   },
   {
+    num: '04',
+    accent: 'var(--at)',
     step: 'Une QA automatisée',
     text: "Un agent joue des scénarios fonctionnels prédéfinis sur plusieurs navigateurs et remonte les incohérences, voire certaines failles de sécurité.",
     tools: ['QA Runner', 'Playwright', 'Chromium · Firefox · WebKit'],
   },
 ];
+
+const derive = {
+  num: '05',
+  accent: 'var(--cv-orange)',
+  step: 'Un garde-fou sur le calcul de la dérive',
+  text: "Mesure l'écart entre le code produit, la spec et l'architecture cible, itération après itération. Un score qui monte déclenche une revue avant de continuer.",
+  tools: ['Spec vs code', 'Score de dérive', 'Historique des itérations'],
+};
 ---
 
 <Layout
@@ -47,11 +65,11 @@ const method = [
     <div class="container topbar-inner">
       <a href="#top" class="brand">G·C</a>
       <nav aria-label="Projets">
+        <a href="#methode" data-nav="methode">Méthode</a>
         <a href="#qa-runner" data-nav="qa-runner">QA Runner</a>
         <a href="#attelya" data-nav="attelya">Attelya</a>
         <a href="#butterfly" data-nav="butterfly">Butterfly</a>
         <a href="#zouritebnb" data-nav="zouritebnb">Zouritebnb</a>
-        <a href="#methode" data-nav="methode">Méthode</a>
       </nav>
       <a class="topbar-cv" href={`${import.meta.env.BASE_URL}CV_Guillaume_Cozic_Product_Engineer.pdf`} download><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11M7 10l5 5 5-5M5 20h14" /></svg><span>CV PDF</span></a>
     </div>
@@ -127,6 +145,49 @@ const method = [
       </div>
     </section>
 
+    <section id="methode" class="method">
+      <div class="container">
+        <p class="eyebrow reveal">Méthode</p>
+        <h2 class="reveal">Garder la qualité et répondre aux exigences</h2>
+        <p class="method-intro reveal">Sur tous mes projets, cinq garde-fous se complètent : l'IA va vite, ces briques garantissent qu'elle va dans la bonne direction.</p>
+
+        <div class="schema">
+          <article class="sch-card sch-wide reveal" style="--accent: var(--cv-blue)">
+            <span class="mono">{harnais.num}</span>
+            <div class="sch-body">
+              <h3>{harnais.step}</h3>
+              <p>{harnais.text}</p>
+            </div>
+            <ul class="tools">{harnais.tools.map((t) => <li>{t}</li>)}</ul>
+          </article>
+
+          <div class="sch-flow reveal" aria-hidden="true"><span>guide</span></div>
+          <div class="sch-ia reveal">IA : génère le code</div>
+          <div class="sch-flow reveal" aria-hidden="true"><span>vérifié par les garde-fous</span></div>
+
+          <div class="sch-row">
+            {gardeFous.map((g, i) => (
+              <article class="sch-card reveal" style={`--accent: ${g.accent}; transition-delay: ${i * 90}ms`}>
+                <span class="mono">{g.num}</span>
+                <h3>{g.step}</h3>
+                <p>{g.text}</p>
+                <ul class="tools">{g.tools.map((t) => <li>{t}</li>)}</ul>
+              </article>
+            ))}
+          </div>
+
+          <article class="sch-card sch-wide reveal" style={`--accent: ${derive.accent}`}>
+            <span class="mono">{derive.num}</span>
+            <div class="sch-body">
+              <h3>{derive.step}</h3>
+              <p>{derive.text}</p>
+            </div>
+            <ul class="tools">{derive.tools.map((t) => <li>{t}</li>)}</ul>
+          </article>
+        </div>
+      </div>
+    </section>
+
     <ProjectSection
       id="qa-runner"
       index="01"
@@ -192,10 +253,12 @@ const method = [
         "L'humain garde la main : chaque action dans le LMS et chaque réponse au client attend le clic de l'agent.",
         "Un banc d'essai réservé aux administrateurs pour tester le prompt de qualification sur n'importe quel email.",
       ]}
-      stack={['Symfony 8.1', 'API Platform 5', 'PHP 8.5', 'PostgreSQL', 'React 19', 'Redux Toolkit', 'NestJS 11', 'Tailwind', 'Infection', 'Stryker', 'Docker', 'Ansible']}
+      stack={['Symfony', 'API Platform', 'PHP', 'PostgreSQL', 'React', 'Redux Toolkit', 'NestJS', 'Tailwind', 'Infection', 'Stryker', 'Docker', 'Ansible']}
     >
       <ButterflyAnimation />
     </ProjectSection>
+
+    <ButterflyFlow />
 
     <ProjectSection
       id="zouritebnb"
@@ -216,28 +279,10 @@ const method = [
         "Des tests de contrat OpenAPI entre l'API et le front, pour qu'un agent ne casse jamais l'autre côté.",
         "Des scénarios de recette en Markdown, rejoués par des agents sur l'environnement qa.zouritebnb.com grâce à QA Runner.",
       ]}
-      stack={['Symfony', 'API Platform', 'PHP 8.5', 'React 19', 'Redux', 'TypeScript', 'Vite', 'Astro', 'MySQL', 'Docker', 'Ansible']}
+      stack={['Symfony', 'API Platform', 'PHP', 'React', 'Redux', 'TypeScript', 'Vite', 'Astro', 'MySQL', 'Docker', 'Ansible']}
     >
       <ZouriteAnimation />
     </ProjectSection>
-
-    <section id="methode" class="method">
-      <div class="container">
-        <p class="eyebrow reveal">Méthode</p>
-        <h2 class="reveal">Comment je garde la main sur la qualité du code produit par l'IA</h2>
-        <p class="method-intro reveal">Sur tous mes projets, quatre garde-fous se complètent : l'IA va vite, ces briques garantissent qu'elle va dans la bonne direction.</p>
-        <ol class="steps">
-          {method.map((m, i) => (
-            <li class="reveal" style={`transition-delay: ${i * 90}ms`}>
-              <span class="mono">0{i + 1}</span>
-              <h3>{m.step}</h3>
-              <p>{m.text}</p>
-              <ul class="tools">{m.tools.map((t) => <li>{t}</li>)}</ul>
-            </li>
-          ))}
-        </ol>
-      </div>
-    </section>
 
     <section id="savoir-etre" class="method soft">
       <div class="container">
@@ -496,8 +541,8 @@ const method = [
   .cards em { font-style: normal; color: var(--ink-3); font-size: 0.9rem; }
 
   .method { padding: clamp(72px, 12vw, 140px) 0; border-top: 1px solid var(--line); }
-  .method h2 { font-size: clamp(2rem, 5vw, 3.2rem); letter-spacing: -0.03em; margin: 12px 0 16px; max-width: 22ch; }
-  .method-intro { color: var(--ink-2); max-width: 60ch; margin: 0 0 40px; font-size: 1.1rem; }
+  .method h2 { font-size: clamp(2rem, 5vw, 3.2rem); letter-spacing: -0.03em; margin: 12px 0 16px; max-width: none; white-space: nowrap; }
+  .method-intro { color: var(--ink-2); max-width: none; white-space: nowrap; margin: 0 0 40px; font-size: 1.1rem; }
   .steps > li { display: flex; flex-direction: column; }
   .steps .tools { list-style: none; padding: 0; margin: 16px 0 0; display: flex; flex-wrap: wrap; gap: 6px; }
   .steps .tools li { border: 1px solid var(--line); border-radius: 999px; padding: 3px 9px; font: 500 0.72rem var(--font-mono); color: var(--ink-2); background: none; }
@@ -522,6 +567,47 @@ const method = [
   .steps h3 { font-size: 1.3rem; margin: 8px 0 10px; }
   .steps p { margin: 0; color: var(--ink-2); font-size: 0.93rem; }
 
+  .schema { display: flex; flex-direction: column; gap: 16px; }
+  .sch-card {
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 22px;
+    background: var(--bg-2);
+    display: flex;
+    flex-direction: column;
+  }
+  .sch-card .mono { color: var(--accent); font-size: 0.8rem; }
+  .sch-card h3 { font-size: 1.2rem; margin: 8px 0 8px; }
+  .sch-card p { margin: 0; color: var(--ink-2); font-size: 0.93rem; }
+  .sch-card .tools { list-style: none; padding: 0; margin: 14px 0 0; display: flex; flex-wrap: wrap; gap: 6px; }
+  .sch-card .tools li { border: 1px solid var(--line); border-radius: 999px; padding: 3px 9px; font: 500 0.72rem var(--font-mono); color: var(--ink-2); }
+  .sch-wide { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 24px; align-items: baseline; }
+  .sch-wide .sch-body { min-width: 0; }
+  .sch-wide .tools { margin: 0; justify-content: flex-end; max-width: 320px; }
+  .sch-wide h3 { margin-top: 0; }
+
+  .sch-flow {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 56px;
+    color: var(--ink-3);
+    font: 500 0.72rem var(--font-mono);
+  }
+  .sch-flow::before { content: ''; flex: 1; width: 1px; background: var(--ink-3); opacity: 0.5; }
+  .sch-flow span { padding: 4px 0; }
+  .sch-ia {
+    align-self: center;
+    border: 1px solid var(--ink-3);
+    border-radius: 12px;
+    padding: 12px 32px;
+    background: var(--panel);
+    font: 600 1.05rem var(--font-display);
+  }
+
+  .sch-row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+  .sch-row .sch-card { height: 100%; }
+
   .footer { border-top: 1px solid var(--line); padding: 32px 0 48px; color: var(--ink-3); font-size: 0.9rem; }
   .footer-inner { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
   .footer a { color: var(--ink-2); }
@@ -529,8 +615,12 @@ const method = [
   @media (max-width: 900px) {
     .principles { grid-template-columns: minmax(0, 1fr); }
     .cards, .steps { grid-template-columns: minmax(0, 1fr); }
+    .sch-row { grid-template-columns: minmax(0, 1fr); }
+    .sch-wide { grid-template-columns: minmax(0, 1fr); gap: 14px; }
+    .sch-wide .tools { justify-content: flex-start; max-width: none; }
   }
   @media (max-width: 640px) {
+    .method h2, .method-intro { white-space: normal; }
     .hero-head { grid-template-columns: minmax(0, 1fr); }
     .portrait { order: -1; width: 150px; }
   }
