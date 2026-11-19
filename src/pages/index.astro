@@ -64,14 +64,17 @@ const derive = {
   <header class="topbar">
     <div class="container topbar-inner">
       <a href="#top" class="brand">G·C</a>
-      <nav aria-label="Projets">
+      <nav id="topbar-nav" aria-label="Projets">
         <a href="#methode" data-nav="methode">Méthode</a>
         <a href="#qa-runner" data-nav="qa-runner">QA Runner</a>
         <a href="#attelya" data-nav="attelya">Attelya</a>
         <a href="#butterfly" data-nav="butterfly">Butterfly</a>
         <a href="#zouritebnb" data-nav="zouritebnb">Zouritebnb</a>
       </nav>
-      <a class="topbar-cv" href={`${import.meta.env.BASE_URL}CV_Guillaume_Cozic_Product_Engineer.pdf`} download><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11M7 10l5 5 5-5M5 20h14" /></svg><span>CV PDF</span></a>
+      <a class="topbar-cv" href={`${import.meta.env.BASE_URL}CV_Guillaume_Cozic_Product_Engineer.pdf`} download aria-label="Télécharger le CV PDF"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11M7 10l5 5 5-5M5 20h14" /></svg><span>CV PDF</span></a>
+      <button class="burger" type="button" aria-controls="topbar-nav" aria-expanded="false" aria-label="Ouvrir le menu">
+        <span></span><span></span><span></span>
+      </button>
     </div>
   </header>
 
@@ -342,6 +345,48 @@ const derive = {
   }
   nav a:hover { color: var(--ink); }
   nav a:global(.active) { color: var(--bg); background: var(--ink); }
+  .burger {
+    display: none;
+    flex: none;
+    width: 38px;
+    height: 38px;
+    padding: 0;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: transparent;
+    color: var(--ink);
+    cursor: pointer;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+  }
+  .burger span { display: block; width: 16px; height: 1.5px; background: currentColor; border-radius: 1px; transition: transform .25s, opacity .2s; }
+  .burger:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
+  .topbar:global(.menu-open) .burger span:nth-child(1) { transform: translateY(5.5px) rotate(45deg); }
+  .topbar:global(.menu-open) .burger span:nth-child(2) { opacity: 0; }
+  .topbar:global(.menu-open) .burger span:nth-child(3) { transform: translateY(-5.5px) rotate(-45deg); }
+
+  @media (max-width: 760px) {
+    .burger { display: inline-flex; }
+    .topbar-cv { margin-left: auto; width: 38px; height: 38px; padding: 0; justify-content: center; }
+    .topbar-cv span { display: none; }
+    nav {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      margin: 0;
+      flex-direction: column;
+      gap: 2px;
+      padding: 10px 16px 16px;
+      background: var(--bg);
+      border-bottom: 1px solid var(--line);
+      display: none;
+    }
+    .topbar:global(.menu-open) nav { display: flex; }
+    nav a { font-size: 1rem; padding: 10px 14px; border-radius: 10px; }
+  }
 
   .hero { position: relative; padding: clamp(80px, 14vw, 160px) 0 clamp(64px, 10vw, 120px); overflow: hidden; }
   .hero-grid {
@@ -625,8 +670,6 @@ const derive = {
     .portrait { order: -1; width: 150px; }
   }
   @media (max-width: 560px) {
-    .brand { display: none; }
-    .topbar-cv span { display: none; }
     .terminal { font-size: 0.8rem; }
   }
   @media (prefers-reduced-motion: reduce) {

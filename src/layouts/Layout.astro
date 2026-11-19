@@ -133,6 +133,27 @@ const { title, description } = Astro.props;
       );
       document.querySelectorAll('section[id]').forEach((s) => navObserver.observe(s));
 
+      // Menu burger (mobile)
+      const topbar = document.querySelector<HTMLElement>('.topbar');
+      const burger = document.querySelector<HTMLButtonElement>('.burger');
+      const setMenu = (open: boolean) => {
+        if (!topbar || !burger) return;
+        topbar.classList.toggle('menu-open', open);
+        burger.setAttribute('aria-expanded', String(open));
+        burger.setAttribute('aria-label', open ? 'Fermer le menu' : 'Ouvrir le menu');
+      };
+      burger?.addEventListener('click', () => setMenu(!topbar?.classList.contains('menu-open')));
+      links.forEach((l) => l.addEventListener('click', () => setMenu(false)));
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') setMenu(false);
+      });
+      document.addEventListener('click', (e) => {
+        if (topbar && !topbar.contains(e.target as Node)) setMenu(false);
+      });
+      window.matchMedia('(min-width: 761px)').addEventListener('change', (e) => {
+        if (e.matches) setMenu(false);
+      });
+
       // Barre de progression de lecture
       const bar = document.querySelector<HTMLElement>('.progress');
       const onScroll = () => {
